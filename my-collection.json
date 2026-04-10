@@ -1,0 +1,204 @@
+{
+  "info": {
+    "_postman_id": "94d7b53d-49a5-42d2-9552-48b92eaba5d5",
+    "name": "For auto test",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "52926528",
+    "_collection_link": "https://go.postman.co/collection/52926528-94d7b53d-49a5-42d2-9552-48b92eaba5d5?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "terminate dda",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// 生成唯一值\r",
+              "const timestamp = Date.now();\r",
+              "const randomNum = Math.floor(Math.random() * 10000);\r",
+              "const uniqueRefNo = `${timestamp}${randomNum}`;\r",
+              "// 生成当天日期\r",
+              "const today = new Date();\r",
+              "const day = String(today.getDate()).padStart(2, '0');\r",
+              "const month = String(today.getMonth() + 1).padStart(2, '0');\r",
+              "const year = today.getFullYear();\r",
+              "const effectiveDate = `${day}/${month}/${year}`;\r",
+              "\r",
+              "// 设置为环境变量或集合变量\r",
+              "pm.environment.set(\"dynamic_boTransactionReferenceNo\", uniqueRefNo);\r",
+              "pm.environment.set(\"dynamic_effectiveTerminationDate\", effectiveDate);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const res = pm.response.json();\r",
+              "const expectedRqUID = pm.variables.get(\"expectedRqUID\") || \"BO\";\r",
+              "const expectedReturnCode = pm.variables.get(\"expectedReturnCode\") || \"UX0000\";\r",
+              "const expectedReturnStatus = pm.variables.get(\"expectedReturnStatus\") || \"Successful\";\r",
+              "\r",
+              "pm.test(\"rqUID 返回正确\", () => {\r",
+              "    pm.expect(res.rqUID).to.equal(expectedRqUID);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"returnCode 返回正确\", () => {\r",
+              "    pm.expect(res.returnCode).to.equal(expectedReturnCode);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"returnStatus 返回正确\", () => {\r",
+              "    pm.expect(res.returnStatus).to.equal(expectedReturnStatus);\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n\"rqUID\":\"BO\",\r\n\"channelType\":\"BOSIN\",\r\n\"qs\":\"SG2BE11S99@SG2BE11\",\r\n\"subOrgId\":\"\",\r\n\"rqstDt\":\"2022-02-28 16:00:00\",\r\n\"boDetail\":{\r\n\t\"requestId\":\"a6bfc2c0-3d46-11eb-adc1-0242ac120003\",\r\n\t\"timeStamp\":\"20260227\",\r\n\t\"boClientID\":\"BOSIN199201624D\",\r\n\t\"boTransactionReferenceNo\":\"{{dynamic_boTransactionReferenceNo}}\",\r\n\t\"boDDARefNo\":\"B99980\",\r\n\t\"boName\":\"Terminate by API\",\r\n\t\"segment\":\"Corporate\",\r\n\t\"nonce\":\"79399129924850509749\",\r\n\t\"purpose\":\"UBIL\",\r\n\t\"effectiveTerminationDate\":\"{{dynamic_effectiveTerminationDate}}\",\r\n\t\"boAccountNo\":\"\"\r\n},\r\n\"applicantBankAccount\":\"0018001410\",\r\n\"CIN\":\"C042812006G\",\r\n\"cinSuffix\":\"00\",\r\n\"Segment\":\"Segment\",\r\n\"accountCurrency\":\"SGD\",\r\n\"purposeofDD\":\"purposeofDD\",\r\n\"messageToApprover\":\"messageToApprover\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://10.62.117.12:9444/idealsso-banking/dda/request/terminate?format=json",
+          "protocol": "https",
+          "host": [
+            "10",
+            "62",
+            "117",
+            "12"
+          ],
+          "port": "9444",
+          "path": [
+            "idealsso-banking",
+            "dda",
+            "request",
+            "terminate"
+          ],
+          "query": [
+            {
+              "key": "format",
+              "value": "json"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "setup dda",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// 1. 生成唯一的 boTransactionReferenceNo\r",
+              "const timestamp = Date.now();              // 毫秒时间戳\r",
+              "const randomNum = Math.floor(Math.random() * 10000); // 0-9999 随机数\r",
+              "const uniqueRefNo = `${timestamp}${randomNum}`;\r",
+              "\r",
+              "// 2. 获取当天日期，格式：DD-MM-YYYY\r",
+              "const today = new Date();\r",
+              "const day = String(today.getDate()).padStart(2, '0');\r",
+              "const month = String(today.getMonth() + 1).padStart(2, '0'); // 月份从0开始\r",
+              "const year = today.getFullYear();\r",
+              "const currentDate = `${day}-${month}-${year}`;\r",
+              "\r",
+              "// 3. 设置为环境变量\r",
+              "pm.environment.set(\"dynamic_boTransactionReferenceNo\", uniqueRefNo);\r",
+              "pm.environment.set(\"dynamic_fromDate\", currentDate);\r",
+              "pm.environment.set(\"dynamic_toDate\", currentDate);\r",
+              "\r",
+              "// 可选：控制台打印验证\r",
+              "console.log(\"Generated boTransactionReferenceNo:\", uniqueRefNo);\r",
+              "console.log(\"Generated fromDate:\", currentDate);\r",
+              "console.log(\"Generated toDate:\", currentDate);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const res = pm.response.json();\r",
+              "const expectedRqUID = pm.variables.get(\"expectedRqUID\") || \"BO\";\r",
+              "const expectedReturnCode = pm.variables.get(\"expectedReturnCode\") || \"UX0000\";\r",
+              "const expectedReturnStatus = pm.variables.get(\"expectedReturnStatus\") || \"Successful\";\r",
+              "\r",
+              "pm.test(\"rqUID 返回正确\", () => {\r",
+              "    pm.expect(res.rqUID).to.equal(expectedRqUID);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"returnCode 返回正确\", () => {\r",
+              "    pm.expect(res.returnCode).to.equal(expectedReturnCode);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"returnStatus 返回正确\", () => {\r",
+              "    pm.expect(res.returnStatus).to.equal(expectedReturnStatus);\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n\"rqUID\":\"BO\",\r\n\"channelType\":\"BOSIN\",\r\n\"qs\":\"SG2BE11SE991@SG2BE11\",\r\n\"subOrgId\":\"\",\r\n\"rqstDt\":\"\",\r\n\"boDetail\":{\r\n\t\"requestId\":\"a6bfc2c0-3d46-11eb-adc1-0242ac120002\",\r\n\t\"boClientID\":\"BOSIN20250915\",\r\n\t\"boTransactionReferenceNo\":\"{{dynamic_boTransactionReferenceNo}}\",\r\n\t\"boDDARefNo\":\"DDA20260305002\",\r\n\t\"boName\":\"Erin\",\r\n\t\"segment\":\"Corporate\",\r\n\t\"nonce\":\"79399129924850509749\",\r\n\t\"purpose\":\"UBIL\"\r\n},\r\n\"applicantBankAccount\":\"0018001410\",\r\n\"maxAmount\":\"100\",\r\n\"fromDate\":\"{{dynamic_fromDate}}\",\r\n\"toDate\":\"{{dynamic_toDate}}\",\r\n\"purposeofDD\":\"purposeofDD\",\r\n\"messageToApprover\":\"messageToApprover\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://10.62.117.12:9444/idealsso-banking/dda/request/create?format=json",
+          "protocol": "https",
+          "host": [
+            "10",
+            "62",
+            "117",
+            "12"
+          ],
+          "port": "9444",
+          "path": [
+            "idealsso-banking",
+            "dda",
+            "request",
+            "create"
+          ],
+          "query": [
+            {
+              "key": "format",
+              "value": "json"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
