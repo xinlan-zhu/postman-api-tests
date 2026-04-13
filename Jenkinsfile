@@ -19,12 +19,9 @@ pipeline {
 
         stage('Run API Tests') {
             steps {
-                sh """
-                    newman run "my-collection.json" \
-                    -r htmlextra \
-                    --reporter-htmlextra-export "newman-report.html"
-                """
-            }
+        // 在Windows上使用bat步骤
+        bat 'newman run my-collection.json -r htmlextra --reporter-htmlextra-export newman-report.html'
+    }
         }
     }
 
