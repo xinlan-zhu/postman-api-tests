@@ -10,7 +10,7 @@ pipeline {
         stage('Run API Tests') {
             steps {
                 // 运行 Newman 命令，生成 HTML 报告
-                bat 'newman run my-collection.json -r htmlextra --reporter-htmlextra-export newman-report.html'
+                bat 'newman run my-collection.json -k -r htmlextra --reporter-htmlextra-export newman-report.html'
             }
         }
     }
